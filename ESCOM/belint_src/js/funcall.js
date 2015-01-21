@@ -1505,6 +1505,7 @@ function grpMaintenances()
 	JSONObject.tablename1 = "tbl_11kv_groupfeedercategories";
 	JSONObject.query1 = "call sp_mis_feedercategory()";
 	JSONObject.query2 = "call sp_mis_get_geoObjectsOfClass(2,null,"+cmp_id+")";
+	JSONObject.query3 = "call sp_11kv_getGroupPriorityBandByCompany("+cmp_id+")";
 	JSONstring = JSON.stringify(JSONObject);
 	runAjax(parser_page,JSONstring);
 }
@@ -1515,6 +1516,7 @@ function grpDropData(content)
 	cont = content;
 	var feederCount = (content.data.Feeder).length;
 	var zoneCount = (content.data.Zone).length;
+	var priorityBandsCount = (content.data.Priority).length;
 	//alert(feederCount+"__"+zoneCount);
 	document.getElementById(content.container).innerHTML = "";
 	var createConfTable = '';
@@ -1555,6 +1557,14 @@ function grpDropData(content)
 					for(var j=0; j<zoneCount; j++)
 						createConfTable += '<option value="'+content.data.Zone[j].GeoID+'">'+content.data.Zone[j].GeoName+'</option>';
 				createConfTable += '</select>';
+			createConfTable += '</td>';
+		createConfTable += '</tr>';
+		createConfTable += '<tr>';
+			createConfTable += '<td>';
+				createConfTable += '<select name="priorityBandSearch" id="priorityBandSearch">';
+					createConfTable += '<option value=null selected>Priority Band</option>';
+					for(var pbc=0;pbc<priorityBandsCount;pbc++)
+						createConfTable += '<option value="'+content.data.Priority[pbc].GroupBandID+'">'+content.data.Priority[pbc].LowerRange+'-'+content.data.Priority[pbc].UpperRange+'</option>'; 
 			createConfTable += '</td>';
 			createConfTable += '<td>';
 				createConfTable += '<select name="peakP" id="peakP">';
@@ -1644,9 +1654,11 @@ function searchGrp()
 	if(zoneObj)
 		zoneObj = zoneObj.substring(0,(zoneObj.length - 1));*/
 	//var parentId = cont.data.UserInfo[0].parent_id;
+	var pbid = document.getElementById("priorityBandSearch").value;
 	var peakP = document.getElementById("peakP").value;
 	var offPeakP = document.getElementById("offPeak").value;
 	var grpName = document.getElementById("grpName").value;
+	
 	if(!grpName)
 		grpName = null;
 	else
@@ -1657,7 +1669,7 @@ function searchGrp()
 	JSONObject.container = "grpBody";
 	JSONObject.database = db_name;
 	JSONObject.tablename = "tbl_11kv_groupfeedercategories";
-	JSONObject.query = "call sp_11kv_searchgroup("+company_id+","+feeder+","+zone+","+peakP+","+offPeakP+","+grpName+")";
+	JSONObject.query = "call sp_11kv_searchgroup1("+company_id+","+feeder+","+zone+","+pbid+","+peakP+","+offPeakP+","+grpName+")";
 	JSONstring = JSON.stringify(JSONObject);
 	//alert(JSONstring);
 	runAjax(parser_page,JSONstring);
@@ -1999,6 +2011,7 @@ function addGrp()
 	JSONObject.tablename1 = "tbl_11kv_groupfeedercategories";
 	JSONObject.query1 = "call sp_mis_feedercategory()";
 	JSONObject.query2 = "call sp_mis_get_geoObjectsOfClass(2,null,"+JSONObject.comp+")";
+	JSONObject.query3 = "call sp_11kv_getGroupPriorityBandByCompany("+JSONObject.comp+")";
 	JSONstring = JSON.stringify(JSONObject);
 	//alert(JSONstring);
 	runAjax(parser_page,JSONstring);
@@ -2016,6 +2029,7 @@ function addGrpData(content)
 	cont = content;
 	var agrCount = content.data.SP1.length;
 	var zoneCount = content.data.SP2.length;
+	var pbCount = content.data.SP3.length;
 	//alert(agrCount+"__"+zoneCount);
 	document.getElementById("body_main_pane").innerHTML = "";
 	var createConfTable = '';
@@ -2030,32 +2044,42 @@ function addGrpData(content)
 
 			var createConfTable1 = '';
 				createConfTable1 += '<td>';
-				createConfTable1 += '<table width="100%">';
+				createConfTable1 += '<table width="50%">';
 				createConfTable1 += '<tr>';
 				createConfTable1 += '<td>Group Name</td>';
 				createConfTable1 += '<td><input type="text" name="grp" id="grpGrd" value="" placeholder="Group Name"></td>';
-				createConfTable1 += '<td></td>';
-				createConfTable1 += '<td></td>';
+				createConfTable1 += '</tr>';
+				createConfTable1 += '</table>';
+				createConfTable1 += '<br />';
+				createConfTable1 += '<table width="100%">';
+				createConfTable1 += '<tr>';
+				createConfTable1 += '<td>Priority Band</td>';
+				createConfTable1 += '<td>Peak Priority</td>';
+				createConfTable1 += '<td>Off Peak Priority</td>';
 				createConfTable1 += '</tr>';
 				createConfTable1 += '<tr>';
-				createConfTable1 += '<td>Priority</td>';
-				createConfTable1 += '<td>';
-					createConfTable1 += '<select name="prio" id="prio">';
-						createConfTable1 += '<option value=0 selected>Priority</option>';
-						for(var i=1;i<=10;i++)
-							createConfTable1 += '<option value='+i+'>'+i+'</option>';
-					createConfTable1 += '</select>';
-				createConfTable1 += '</td>';
-				//createConfTable1 += '<td></td>';
-				createConfTable1 += '<td>Off Priority</td>';
-				createConfTable1 += '<td>';
-					createConfTable1 += '<select name="offPrio" id="offPrio">';
-						createConfTable1 += '<option value=0 selected>Off Priority</option>';
-						for(var j=1;j<=10;j++)
-							createConfTable1 += '<option value='+j+'>'+j+'</option>';
-					createConfTable1 += '</select>';
-				createConfTable1 += '</td>';
 				createConfTable1 += '</tr>';
+				for(var gridRows=0;gridRows<pbCount;gridRows++){
+					createConfTable1 += '<tr name="prioritySelectionRow" id="priorityBandID_'+content.data.SP3[gridRows].GroupBandID+'">';
+					createConfTable1 += '<td>';
+						createConfTable1 += content.data.SP3[gridRows].LowerRange+'-'+content.data.SP3[gridRows].UpperRange; 
+					createConfTable1 += '</td>';
+					createConfTable1 += '<td>';
+						createConfTable1 += '<select name="prio" id="priorityValue_'+gridRows+'">';
+							createConfTable1 += '<option value=0 selected>Priority</option>';
+							for(var i=1;i<=10;i++)
+								createConfTable1 += '<option value='+i+'>'+i+'</option>';
+						createConfTable1 += '</select>';
+					createConfTable1 += '</td>';
+					createConfTable1 += '<td>';
+						createConfTable1 += '<select name="offPrio" id="offPriorityValue_'+gridRows+'">';
+							createConfTable1 += '<option value=0 selected>Off Priority</option>';
+							for(var j=1;j<=10;j++)
+								createConfTable1 += '<option value='+j+'>'+j+'</option>';
+						createConfTable1 += '</select>';
+					createConfTable1 += '</td>';
+					createConfTable1 += '</tr>';
+				}
 				//createConfTable1 += '</table>';
 			//document.getElementById("stationPrior").innerHTML = createConfTable1;
 			//createConfTable1 += '<table width="100%">';
@@ -2719,14 +2743,52 @@ function submitGrp()
 	}
 	if(station)
 		station = station.substring(0,(station.length - 1));
-	var priority = parseInt(document.getElementById("prio").value);
-	var offPriority = parseInt(document.getElementById("offPrio").value);
+	//var priority = parseInt(document.getElementById("prio").value);
+	//var offPriority = parseInt(document.getElementById("offPrio").value);
 	var groupName = document.getElementById("grpGrd").value;
+	var priorities = '';
+	var offPriorities = '';
+	var priorityBandRows = document.getElementsByName("prioritySelectionRow");
+	var priorityBands = '';
+	//console.log("Total Priority Bands "+priorityBandRows.length);
+	for(var pb=0; pb<priorityBandRows.length; pb++)
+		priorityBands += parseInt(pb+1)+',';
+	//console.log(priorityBands);
+
+	for(var pb=0; pb<priorityBandRows.length; pb++)
+	{
+		
+		if(document.getElementById("priorityValue_"+pb).value > 0)
+		{
+			priorities += document.getElementById("priorityValue_"+pb).value+',';
+		}
+		else
+		{
+			alert("Priority cannot be left blank! Select a Priority for Each Priority Band.");
+			return;
+		}
+
+		if(document.getElementById("offPriorityValue_"+pb).value >0)
+		{
+			offPriorities += document.getElementById("offPriorityValue_"+pb).value+',';
+		}
+		else
+		{
+			alert("Off Priority cannot be left blank! Select a Off Peak Priority for Each Priority Band.");
+			return;
+		}
+	}
+
+	//console.log("priorities "+priorities);
+	//console.log("offPriorities "+offPriorities);
+				
+
 	if(!groupName)
 	{
 		alert("Group Name can not be left blank!");
 		return;
 	}
+	/*
 	if(!priority)
 	{
 		alert("Priority can not be left blank!");
@@ -2736,7 +2798,7 @@ function submitGrp()
 	{
 		alert("Off Priority can not be left blank!");
 		return;
-	}
+	}*/
 	for(var j=1; j<=globalCount; j++)
 	{
 		if(document.getElementById("feedFinal_"+j).chekced)
@@ -2746,6 +2808,7 @@ function submitGrp()
 		}
 		else alert("nots");
 	}
+	//console.log(statn);
 	//alert(statn);
 	if(statn)
 		statn = statn.substring(0,(statn.length - 1));
@@ -2761,7 +2824,8 @@ function submitGrp()
 	JSONObject.container = "body_main_pane";
 	JSONObject.database = db_name;
 	JSONObject.tablename = "tbl_11kv_groupfeedercategories";
-	JSONObject.query = "call sp_11kv_createGroup('"+groupName+"',"+priority+","+offPriority+","+company_id+","+user_id+",'"+statn+"')";
+	//JSONObject.query = "call sp_11kv_createGroup('"+groupName+"',"+priority+","+offPriority+","+company_id+","+user_id+",'"+statn+"')";
+	JSONObject.query = "call sp_11kv_createGroup1('"+groupName+"',"+company_id+","+user_id+",'"+statn+"','"+priorities+"', '"+offPriorities+"', '"+priorityBands+"')";
 	JSONstring = JSON.stringify(JSONObject);
 	//alert(JSONstring);
 	runAjax(parser_page,JSONstring);

@@ -1,5 +1,6 @@
 <?php
 define("SQL_HOST","127.0.0.1");
+*//*define("SQL_HOST","164.100.133.243");
 define("SQL_USER","root");
 define("SQL_PASS","");
 define("SQL_DB","escom");

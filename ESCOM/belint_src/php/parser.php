@@ -113,7 +113,8 @@ switch($decoded->jcase)
 		$operation = "SELECT";
 		$mysqlData1 = $objJSON->executeSP($decoded->database, $decoded->tablename1, $decoded->query1, $operation);
 		$mysqlData2 = $objJSON->executeSP($decoded->database, $decoded->tablename1, $decoded->query2, $operation);
-		$finalVal = array("SP1"=>$mysqlData1,"SP2"=>$mysqlData2);
+		$mysqlData3 = $objJSON->executeSP($decoded->database, $decoded->tablename1, $decoded->query3, $operation);
+		$finalVal = array("SP1"=>$mysqlData1,"SP2"=>$mysqlData2, "SP3"=>$mysqlData3);
 		//print_r($finalVal);
 		die($objJSON->getJSONarray($decoded->jcase,$decoded->container,$finalVal,"0"));
 	break;
@@ -274,7 +275,8 @@ switch($decoded->jcase)
 		$operation = "SELECT";
 		$mysqlData1 = $objJSON->executeSP($decoded->database, $decoded->tablename1, $decoded->query1, $operation);
 		$mysqlData2 = $objJSON->executeSP($decoded->database, $decoded->tablename1, $decoded->query2, $operation);
-		$finalVal = array("Feeder"=>$mysqlData1, "Zone"=>$mysqlData2);
+		$mysqlData3 = $objJSON->executeSP($decoded->database, $decoded->tablename1, $decoded->query3, $operation);
+		$finalVal = array("Feeder"=>$mysqlData1, "Zone"=>$mysqlData2, "Priority"=>$mysqlData3);
 		die($objJSON->getJSONarray($decoded->jcase,$decoded->container,$finalVal,"0"));
 	break;
 	
