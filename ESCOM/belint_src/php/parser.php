@@ -56,7 +56,8 @@ switch($decoded->jcase)
 		$mysqlData2 = $objJSON->executeSP($decoded->database, $decoded->tablename, $qry2, $operation);
 		$mysqlData3 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query1, $operation);
 		$mysqlData4 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query2, $operation);
-		$finalVal = array("Feeder"=>$mysqlData3, "Zone"=>$mysqlData4, "DATA1"=>$mysqlData1,"DATA2"=>$mysqlData2);
+		$mysqlData5 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query3, $operation);
+		$finalVal = array("Feeder"=>$mysqlData3, "Zone"=>$mysqlData4, "DATA1"=>$mysqlData1,"DATA2"=>$mysqlData2, "PRIORITIES"=>$mysqlData5);
 		//print_r($finalVal);
 		die($objJSON->getJSONarray($decoded->jcase,$decoded->container,$finalVal,"0"));
 	break;

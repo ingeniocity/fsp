@@ -1767,6 +1767,7 @@ function viewGrpInfo(obj)
 	JSONObject.query1 = "call sp_mis_feedercategory()";
 	JSONObject.query2 = "call sp_mis_get_geoObjectsOfClass(2,null,"+cmp_id+")";
 	JSONObject.query = "call sp_11kv_getgroupbyid("+parseInt(obj)+")";
+	JSONObject.query3 = "call sp_11kv_getGroupPriorityBandByCompany("+cmp_id+")";
 	//document.getElementById("body_main_pane").innerHTML = "sp_mis_feedercategory()&nbsp;sp_mis_get_geoObjectsOfClass(2,null,"+cmp_id+")&nbsp;sp_11kv_getgroupbyid("+parseInt(obj)+")";
 	JSONstring = JSON.stringify(JSONObject);
 	//alert(JSONstring);
@@ -1781,6 +1782,7 @@ function viewGrpDetail(content)
 	var data2Count = content.data.DATA2.length;
 	var FCount = content.data.Feeder.length;
 	var ZCount = content.data.Zone.length;
+	var priorityCount = content.data.PRIORITIES.length;
 	document.getElementById("body_main_pane").innerHTML = "";
 	var createConfTable = '';
 	/*
@@ -1811,17 +1813,24 @@ function viewGrpDetail(content)
 		createConfTable += '</tr>';
 		
 		createConfTable += '<tr><td colspan="5">&nbsp;</td></tr>';
-		createConfTable += '<tr>';
+		createConfTable += '<td>Priority Band</td>';
+		createConfTable += '<td >&nbsp;</td>';
+		createConfTable += '<td>Peak Priority</td>';
+		createConfTable += '<td>Off Priority Priority</td>';
+		for(var pb=0;pb<priorityCount;pb++)
+		{
+			createConfTable += '<tr name="priorityBandUpdateRow">';
 			/*if(getConfTableG && getConfTableG1)
 				createConfTable += getConfTableG+getConfTableG1;
 			createConfTable += '</td>';
 			document.getElementById("stationGrd").innerHTML = createConfTable;
 			var createConfTable1 = '';*/
+				createConfTable += '<td>'+content.data.PRIORITIES[pb].LowerRange+'-'+content.data.PRIORITIES[pb].UpperRange+'</td>';
 				createConfTable += '<td  class="confFont">Priority</td>';
 				createConfTable += '&nbsp;&nbsp;&nbsp;&nbsp<td  class="confFont" style="">';
-					createConfTable += '<select name="prio" id="prio" class="selectGrp" style="">';
+					createConfTable += '<select name="updatePriority_'+pb+'" id="updatePriority_'+pb+'" class="selectGrp" style="">';
 						createConfTable += '<option value=0 >Priority</option>';
-						createConfTable += '<option value='+parseInt(content.data.DATA1[0].PeakPriority)+' selected>'+parseInt(content.data.DATA1[0].PeakPriority)+'</option>';
+						createConfTable += '<option value='+parseInt(content.data.DATA1[pb].PeakPriority)+' selected>'+parseInt(content.data.DATA1[pb].PeakPriority)+'</option>';
 						for(var i=1;i<=10;i++)
 							createConfTable += '<option value='+i+'>'+i+'</option>';
 					createConfTable += '</select>';
@@ -1830,14 +1839,15 @@ function viewGrpDetail(content)
 				createConfTable += '<td align="left" class="confFont">Off Priority</td>';
 				
 				createConfTable += '<td  class="confFont">';
-					createConfTable += '&nbsp;&nbsp;&nbsp;&nbsp;<select name="offPrio" id="offPrio" class="selectGrp" style="">';
+					createConfTable += '&nbsp;&nbsp;&nbsp;&nbsp;<select name="updateOffPriority_'+pb+'" id="updateOffPriority_'+pb+'" class="selectGrp" style="">';
 						createConfTable += '<option value=0 >Off Peak Priority</option>';
-						createConfTable += '<option value='+parseInt(content.data.DATA1[0].OffPeakPriority)+' selected>'+parseInt(content.data.DATA1[0].OffPeakPriority)+'</option>';
+						createConfTable += '<option value='+parseInt(content.data.DATA1[pb].OffPeakPriority)+' selected>'+parseInt(content.data.DATA1[pb].OffPeakPriority)+'</option>';
 						for(var j=1;j<=10;j++)
 							createConfTable += '<option value='+j+'>'+j+'</option>';
 					createConfTable += '</select>';
 				createConfTable += '</td>';
-		createConfTable += '</tr>';
+			createConfTable += '</tr>';
+		}
 		createConfTable += '<tr><td>&nbsp;</td></tr>';
 		
 		createConfTable += '<tr>';
@@ -1970,6 +1980,32 @@ function updateGrp(count)
 	var grpId = viewGrp.data.DATA1[0].GroupID;
 	var cat = document.getElementById("cat").value;
 	var feeder = '';
+	var priorityBandCount = document.getElementsByName("priorityBandUpdateRow").length;
+	var priorityBands = '';
+	var priorities = '';
+	var offPriorities = '';
+	for(var pb=0; pb<priorityBandCount;pb++)
+	{
+		priorityBands += pb+',';
+		
+		if(document.getElementbyId("updatePriority_"+pb).value > 0)
+			priorities += document.getElementById("updatePrioroty_"+pb).value;
+		else{
+			alert("Priority cannot be left blank! Select a priority for every Band.");
+			return;
+		}
+
+		if(document.getElementById("updateOffPriority_"+pb).value > 0)
+			offPriorities += document.getElementById("updateOffPriority_"+pb).value;
+		else{
+			alert("Off PeaK Priority cannot be left blank! Select an off peak priority for each band.");
+			return;
+		}
+	}
+	console.log(priorityBands);
+	console.log(priorites);
+	console.log(offPriorities);
+	
 	for(var i=1; i<=globalCountA; i++)
 	{
 		if(document.getElementById("feedChk_"+i).checked)
@@ -1988,7 +2024,8 @@ function updateGrp(count)
 	JSONObject.grpId = grpId;
 	JSONObject.database = db_name;
 	JSONObject.tablename = "tbl_11kv_groupfeedercategories";
-	JSONObject.query = "call sp_11kv_updateGroup('"+grp+"',"+priority+","+offPriority+","+company_id+","+user_id+",'"+feeder+"',"+grpId+")";
+	//JSONObject.query = "call sp_11kv_updateGroup('"+grp+"',"+priority+","+offPriority+","+company_id+","+user_id+",'"+feeder+"',"+grpId+")";
+	JSONObject.query = "call sp_11kv_updateGroup1('"+grp+"','"+priorityBands+"','"+priorities+"','"+offPriorities+"',"+company_id+","+user_id+",'"+feeder+"',"+grpId+")";
 	JSONstring = JSON.stringify(JSONObject);
 	//alert(JSONstring);
 	runAjax(parser_page,JSONstring);
