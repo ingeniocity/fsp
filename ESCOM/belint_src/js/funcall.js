@@ -1830,7 +1830,7 @@ function viewGrpDetail(content)
 				createConfTable += '&nbsp;&nbsp;&nbsp;&nbsp<td  class="confFont" style="">';
 					createConfTable += '<select name="updatePriority_'+pb+'" id="updatePriority_'+pb+'" class="selectGrp" style="">';
 						createConfTable += '<option value=0 >Priority</option>';
-						createConfTable += '<option value='+parseInt(content.data.DATA1[pb].PeakPriority)+' selected>'+parseInt(content.data.DATA1[pb].PeakPriority)+'</option>';
+						createConfTable += '<option value='+parseInt(content.data.DATA1[0].PeakPriority)+' selected>'+parseInt(content.data.DATA1[0].PeakPriority)+'</option>';
 						for(var i=1;i<=10;i++)
 							createConfTable += '<option value='+i+'>'+i+'</option>';
 					createConfTable += '</select>';
@@ -1841,7 +1841,7 @@ function viewGrpDetail(content)
 				createConfTable += '<td  class="confFont">';
 					createConfTable += '&nbsp;&nbsp;&nbsp;&nbsp;<select name="updateOffPriority_'+pb+'" id="updateOffPriority_'+pb+'" class="selectGrp" style="">';
 						createConfTable += '<option value=0 >Off Peak Priority</option>';
-						createConfTable += '<option value='+parseInt(content.data.DATA1[pb].OffPeakPriority)+' selected>'+parseInt(content.data.DATA1[pb].OffPeakPriority)+'</option>';
+						createConfTable += '<option value='+parseInt(content.data.DATA1[0].OffPeakPriority)+' selected>'+parseInt(content.data.DATA1[0].OffPeakPriority)+'</option>';
 						for(var j=1;j<=10;j++)
 							createConfTable += '<option value='+j+'>'+j+'</option>';
 					createConfTable += '</select>';
