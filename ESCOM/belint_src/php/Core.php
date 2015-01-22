@@ -71,7 +71,35 @@ class JsonClass
 		mysqli_close($mysqli);
 		return($out);
 	}
+	/*
+	public function executeSPMultiDataSet($database, $tablename, $query, $operation)
+	{
+		$objJSON = new JsonClass();
+		$mysqli = new mysqli(SQL_HOST, SQL_USER, SQL_PASS, $database);
+		if($mysqli->connect_errno)
+			return "Failed to Connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 
+		$result = $mysqli->query($query);
+
+		if (!$result)
+			return "CALL Failed: (" . $mysqli->errno . ") " . $mysqli->error;
+
+		$i = 0;
+		$out = array();
+		do {
+			$rowset = $result->fetch_assoc();
+			if ($rowset) {
+				$out[] = $objJSON->getiJSON($rowset);
+			}
+			$i++;
+		} while ($result->nextRowset());
+
+		//$out = $objJSON->getiJSON($result);
+
+		mysqli_close($mysqli);
+		return($out);
+	}
+	*/
 
 	public function executeSP_MULTI($database, $tablename, $query, $operation)
 	{

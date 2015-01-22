@@ -51,13 +51,12 @@ switch($decoded->jcase)
 	
 	case "grpView":
 		$operation = "INSERT";
-		$mysqlData1 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query, $operation);
+		$mysqlData1 = $objJSON->executeSP_MULTI($decoded->database, $decoded->tablename, $decoded->query, $operation);
 		$qry2 = "SELECT Class8GeoID,FEEDER_NAME, STATION, FEEDER_SHUTDOWN_GROUP FROM tbl_feederhierarchy where GROUP_ID=".$decoded->id;
 		$mysqlData2 = $objJSON->executeSP($decoded->database, $decoded->tablename, $qry2, $operation);
 		$mysqlData3 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query1, $operation);
 		$mysqlData4 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query2, $operation);
-		$mysqlData5 = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query3, $operation);
-		$finalVal = array("Feeder"=>$mysqlData3, "Zone"=>$mysqlData4, "DATA1"=>$mysqlData1,"DATA2"=>$mysqlData2, "PRIORITIES"=>$mysqlData5);
+		$finalVal = array("Feeder"=>$mysqlData3, "Zone"=>$mysqlData4, "DATA1"=>$mysqlData1,"DATA2"=>$mysqlData2);
 		//print_r($finalVal);
 		die($objJSON->getJSONarray($decoded->jcase,$decoded->container,$finalVal,"0"));
 	break;
