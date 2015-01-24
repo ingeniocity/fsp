@@ -1749,7 +1749,8 @@ function deleteGrp(obj)
 	JSONObject.container = "";
 	JSONObject.database = db_name;
 	JSONObject.tablename = "tbl_11kv_groupfeedercategories";
-	JSONObject.query = "call sp_11kv_deleteGroup("+parseInt(obj)+")";
+	//JSONObject.query = "call sp_11kv_deleteGroup("+parseInt(obj)+")";
+	JSONObject.query = "call sp_11kv_deleteGroup1("+parseInt(obj)+")";
 	JSONstring = JSON.stringify(JSONObject);
 	var x = confirm("Are you sure you want to delete this group?");
 	if(x)
@@ -1839,7 +1840,10 @@ function viewGrpDetail(content)
 						createConfTable += '<option value=0 >Priority</option>';
 						createConfTable += '<option value='+parseInt(content.data.DATA1.OUT3[pb].PeakPriority)+' selected>'+parseInt(content.data.DATA1.OUT3[pb].PeakPriority)+'</option>';
 						for(var i=1;i<=10;i++)
-							createConfTable += '<option value='+i+'>'+i+'</option>';
+						{
+							if(i != parseInt(content.data.DATA1.OUT3[pb].PeakPriority))
+								createConfTable += '<option value='+i+'>'+i+'</option>';
+						}
 					createConfTable += '</select>';
 				createConfTable += '</td>';
 				//createConfTable += '<td >&nbsp;</td>';
@@ -1851,7 +1855,10 @@ function viewGrpDetail(content)
 						createConfTable += '<option value=0 >Off Peak Priority</option>';
 						createConfTable += '<option value='+parseInt(content.data.DATA1.OUT3[pb].OffPeakPriority)+' selected>'+parseInt(content.data.DATA1.OUT3[pb].OffPeakPriority)+'</option>';
 						for(var j=1;j<=10;j++)
-							createConfTable += '<option value='+j+'>'+j+'</option>';
+						{
+							if(j != parseInt(content.data.DATA1.OUT3[pb].OffPeakPriority))
+								createConfTable += '<option value='+j+'>'+j+'</option>';
+						}
 					createConfTable += '</select>';
 				createConfTable += '</td>';
 			createConfTable += '</tr>';
@@ -1986,7 +1993,7 @@ function noneMeVT(obj, oid)
 
 function updateGrp(count)
 {
-	var grpId = viewGrp.data.DATA1[0].GroupID;
+	var grpId = viewGrp.data.DATA1.OUT1[0].GroupID;
 	var cat = document.getElementById("cat").value;
 	var feeder = '';
 	var priorityBandCount = document.getElementsByName("priorityBandUpdateRow").length;
@@ -1995,22 +2002,29 @@ function updateGrp(count)
 	var offPriorities = '';
 	for(var pb=0; pb<priorityBandCount;pb++)
 	{
-		priorityBands += pb+',';
+		priorityBands += (parseInt(pb+1))+',';
 		
-		if(document.getElementbyId("updatePriority_"+pb).value > 0)
-			priorities += document.getElementById("updatePrioroty_"+pb).value;
+		if(document.getElementById("updatePriority_"+pb).value > 0)
+			priorities += document.getElementById("updatePriority_"+pb).value + ',';
 		else{
 			alert("Priority cannot be left blank! Select a priority for every Band.");
 			return;
 		}
 
 		if(document.getElementById("updateOffPriority_"+pb).value > 0)
-			offPriorities += document.getElementById("updateOffPriority_"+pb).value;
+			offPriorities += document.getElementById("updateOffPriority_"+pb).value + ',';
 		else{
 			alert("Off PeaK Priority cannot be left blank! Select an off peak priority for each band.");
 			return;
 		}
 	}
+	if(priorities)
+		priorities = priorities.substring(0,(priorities.length - 1));
+	if(offPriorities)
+		offPriorities = offPriorities.substring(0,(offPriorities.length - 1));
+	if(priorityBands)
+		priorityBands = priorityBands.substring(0,(priorityBands.length - 1));
+
 	//console.log(priorityBands);
 	//console.log(priorites);
 	//console.log(offPriorities);
@@ -2022,8 +2036,8 @@ function updateGrp(count)
 	}
 	if(feeder)
 		feeder = feeder.substring(0,(feeder.length - 1));
-	var priority = document.getElementById("prio").value;
-	var offPriority = document.getElementById("offPrio").value;
+	//var priority = document.getElementById("prio").value;
+	//var offPriority = document.getElementById("offPrio").value;
 	var grp = document.getElementById("grpGrd").value;
 	var company_id = cmp_id;
 	//alert(cat+"_"+feeder+"_"+priority+"_"+offPriority+"_"+grp+"_"+company_id+"_"+grpId);
@@ -2799,6 +2813,9 @@ function submitGrp()
 	//console.log("Total Priority Bands "+priorityBandRows.length);
 	for(var pb=0; pb<priorityBandRows.length; pb++)
 		priorityBands += parseInt(pb+1)+',';
+	if(priorityBands)
+		priorityBands = priorityBands.substring(0, (priorityBands.length - 1));
+
 	//console.log(priorityBands);
 
 	for(var pb=0; pb<priorityBandRows.length; pb++)
@@ -2827,6 +2844,11 @@ function submitGrp()
 
 	//console.log("priorities "+priorities);
 	//console.log("offPriorities "+offPriorities);
+	if(priorities)
+		priorities = priorities.substring(0, (priorities.length - 1));
+
+	if(offPriorities)
+		offPriorities = offPriorities.substring(0, (offPriorities.length - 1));
 				
 
 	if(!groupName)
@@ -2847,12 +2869,15 @@ function submitGrp()
 	}*/
 	for(var j=1; j<=globalCount; j++)
 	{
-		if(document.getElementById("feedFinal_"+j).chekced)
+		if(document.getElementById("feedFinal_"+j))
 		{
-			alert(document.getElementById("feedFinal_"+j).name);
-			statn += document.getElementById("feedFinal_"+j).name+',';
+			if(document.getElementById("feedFinal_"+j).checked)
+			{
+				alert(document.getElementById("feedFinal_"+j).name);
+				statn += document.getElementById("feedFinal_"+j).name+',';
+			}
+			else alert("nots");
 		}
-		else alert("nots");
 	}
 	//console.log(statn);
 	//alert(statn);
@@ -2862,15 +2887,17 @@ function submitGrp()
 		alert("Please select atleast one Feeder");
 		return;
 	}
-	var company_id = user_id;
-	var user_id = userna;
+	var company_id = cmp_id;
+	console.log(company_id);
+	console.log(user_id);
+	//console.log(userna);
 	
 	var JSONObject = new Object;
 	JSONObject.jcase = "createGrp";
 	JSONObject.container = "body_main_pane";
 	JSONObject.database = db_name;
 	JSONObject.tablename = "tbl_11kv_groupfeedercategories";
-	//JSONObject.query = "call sp_11kv_createGroup('"+groupName+"',"+priority+","+offPriority+","+company_id+","+user_id+",'"+statn+"')";
+	//JSONObject.query = "call sp_11kv_createGroup('"+groupName+"',1,1,"+company_id+","+user_id+",'"+statn+"')";
 	JSONObject.query = "call sp_11kv_createGroup1('"+groupName+"',"+company_id+","+user_id+",'"+statn+"','"+priorities+"', '"+offPriorities+"', '"+priorityBands+"')";
 	JSONstring = JSON.stringify(JSONObject);
 	//alert(JSONstring);

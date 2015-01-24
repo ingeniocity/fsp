@@ -49,6 +49,7 @@ class JsonClass
 
 	public function getiJSON($resultSet)
 	{
+		//print_r($resultSet);
 		$rows = array();
 		while($r = mysqli_fetch_assoc($resultSet))
 			$rows[] = $r;

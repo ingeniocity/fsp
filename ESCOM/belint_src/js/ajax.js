@@ -279,6 +279,7 @@ function runAjax(page, val)
 
 function parseJSON(JSONresponse)
 {
+	console.log(JSONresponse);
 	var JSONobject = JSON.parse(JSONresponse);
 	if(parseInt(JSONobject.error))
 	{
