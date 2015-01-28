@@ -2888,8 +2888,8 @@ function submitGrp()
 		return;
 	}
 	var company_id = cmp_id;
-	console.log(company_id);
-	console.log(user_id);
+	//console.log(company_id);
+	//console.log(user_id);
 	//console.log(userna);
 	
 	var JSONObject = new Object;

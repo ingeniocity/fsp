@@ -429,6 +429,7 @@ function parseJSON(JSONresponse)
 		break;
 		
 		case "createGrp":
+			alert("Group Added Succesfully!");
 			addGrp();
 		break;
 		

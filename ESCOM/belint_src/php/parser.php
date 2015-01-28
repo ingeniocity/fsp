@@ -44,7 +44,8 @@ switch($decoded->jcase)
 	
 	case "grpUpdate":
 		$operation = "UPDATE";
-		$mysqlData = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query, $operation);
+		//$mysqlData = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query, $operation);
+		$mysqlData = $objJSON->executeSQL($decoded->database, $decoded->tablename, $decoded->query, $operation);
 		//print_r($mysqlData);
 		die($objJSON->getJSONarray($decoded->jcase,$decoded->container,$decoded->grpId,"0"));
 	break;
@@ -76,7 +77,8 @@ switch($decoded->jcase)
 	
 	case "createGrp":
 		$operation = "INSERT";
-		$mysqlData = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query, $operation);
+		//$mysqlData = $objJSON->executeSP($decoded->database, $decoded->tablename, $decoded->query, $operation);
+		$mysqlData = $objJSON->executeSQL($decoded->database, $decoded->tablename, $decoded->query, $operation);
 		//print_r($mysqlData);
 		die($objJSON->getJSONarray($decoded->jcase,$decoded->container,$mysqlData,"0"));
 	break;
