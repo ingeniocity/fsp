@@ -2873,7 +2873,7 @@ function submitGrp()
 		{
 			if(document.getElementById("feedFinal_"+j).checked)
 			{
-				alert(document.getElementById("feedFinal_"+j).name);
+				//alert(document.getElementById("feedFinal_"+j).name);
 				statn += document.getElementById("feedFinal_"+j).name+',';
 			}
 			else alert("nots");
